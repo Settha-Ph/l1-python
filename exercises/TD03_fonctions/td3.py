@@ -1,3 +1,5 @@
+import time
+
 """temps[0] : jours, temps[1]: heures, temps[2]: minutes, temps[3]: secondes"""
 
 
@@ -85,25 +87,130 @@ def proportionTemps(temps,proportion):
 
 #afficheTemps(proportionTemps(0.2, (2,0,36,0)))
 
+def isBissextile(annee):
+    """Fonction qui vérifie si une année est bissextile"""
+    l = [annee]
+    if ((annee%4 == 0 and annee%100 != 0) or annee%400 == 0):
+        return True
+    else:
+        return False
 
+#Prend un tuple en argument et renvoie un tuple  (tempsEnDate : (int*int*int*int) -> (int*int*int*int*int*int))
 def tempsEnDate(temps):
-    année = 1970 + temps[0] // 365
-    jour = temps[0] % 31
+    """Donne la date sous la forme (année, mois, jour, heure, minute, seconde) en prenant en compte le nombre de jour dans le mois et les années bissextiles"""
+    totalJour = temps[0]
+    #Vérifie si l'année est bissextile pour soustraire le bon nombre de jour
+    annee = 1970
+    while totalJour >= 365 :
+        annee += 1
+        if isBissextile(annee):
+            totalJour -= 366
+        else:
+            totalJour -= 365
+
+    #Vérifie le nombre de jour dans un mois
+    listeMoisAvecPlusDeJour = [1, 3, 5, 7, 8, 10, 12]
+    mois = 1
+    while totalJour >= 30:
+        mois += 1
+        if mois == 2 and isBissextile(annee):
+            totalJour -= 29
+        elif mois == 2 and not isBissextile(annee):
+            totalJour -= 28
+        elif mois in listeMoisAvecPlusDeJour:
+            totalJour -= 31
+        else:
+            totalJour -= 30
+
+    
+    jour = totalJour
     heure = temps[1]
     minute = temps[2]
     sec = temps[3]
-    return(année, jour, heure, minute, sec)
+    return(annee, mois, jour, heure, minute, sec)
     
     
 
 
 def afficheDate(date = -1):
-    mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
-
-    print(date)
+    if date == -1:
+        print(time.gmtime)
+    else:
+        listeMois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+        res = str(date[2]) + " " + str(listeMois[date[1] - 1]) + " " + str(date[0]) + " " + str(date[3]) + ":" + str(date[4]) + ":" + str(date[5])
+        print(res)
+    
     
 
-temps = secondeEnTemps(1000000000)
-afficheTemps(temps)
-afficheDate(tempsEnDate(temps))
+#temps = secondeEnTemps(1000000000)
+#afficheTemps(temps)
+#afficheDate(tempsEnDate(temps))
 #afficheDate()
+
+
+#nombreBisextile prend un int en argument et renvoie un int (nombreBisextile : int -> int)
+def nombreBisextile(jour):
+    """Renvoie le nombre d'années bissextiles pour un nombre de jour donnée"""
+    annee = 1970
+    res = 0
+    while jour >= 365 :
+        annee += 1
+        if isBissextile(annee):
+            jour -= 366
+            res += 1
+        else:
+            jour -= 365
+    return res
+
+
+def tempsEnDateBisextile(temps):
+    """Voir la fonction tempsEnDate"""
+    pass
+
+#bisextile(20000)
+
+
+def verifie(liste_temps):
+    """Vérifie si la charge horaire donnée par une liste ne dépasse pas 48h par semaine et 140h par mois, renvoie un booleean"""
+    isAbove = False
+    res = []
+    listeSommeMois = []
+    for i in range(len(liste_temps)):
+        sommeMois = 0
+        for j in range(len(liste_temps[i])):
+            if liste_temps[i][j] > 48:
+                res.append((i+1, j+1, liste_temps[i][j]))
+                isAbove = True
+            sommeMois += liste_temps[i][j]
+
+        if sommeMois > 140:
+            isAbove = True
+            listeSommeMois.append((i+1, sommeMois))
+
+    if res:
+        for e in res:
+            print("Mois : {0}, Semaine : {1}, {2}h de travail !".format(e[0], e[1], e[2]))
+        print("\n")
+
+    if listeSommeMois:
+        for e in listeSommeMois:
+            print("Le mois {0} comptabilise {1} de travail !".format(e[0], e[1]))
+
+    return isAbove
+
+
+#liste_temps = [[1,2,39,34],[0,1,9,4],[0,29,39,51],[0,31,13,46]]
+#verifie(liste_temps)
+
+
+
+def calculs(b,c):
+    a = 2
+    c = a * 2
+    a = 1
+    return a + b
+    
+def dernierExo():
+    c = 1
+    b = calculs(3,4)
+    print(a,b,c)
